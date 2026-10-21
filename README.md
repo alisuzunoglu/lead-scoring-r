@@ -26,7 +26,7 @@ The data file is not included.
 
 ## Learning context
 
-Self-directed learning project, made while studying introductory R, with Claude used for explanations, coding help and feedback.
+Self-directed learning project, made while studying introductory R.
 
 ## Data
 
