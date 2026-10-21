@@ -2,7 +2,7 @@
 
 Can three simple facts about a sales lead help decide which leads to prioritise? This project builds a transparent 0 to 3 score in R on a public dataset and tests it on a random hold-out sample of leads.
 
-**Read the report:** PASTE YOUR PUBLIC REPORT LINK HERE
+**Read the report:** https://01a15b35-f593-c789-5b56-30df00a7d75d.share.connect.posit.cloud/
 
 ## What is in this repository
 
@@ -31,6 +31,3 @@ Self-directed learning project, made while studying introductory R, with Claude 
 ## Data
 
 X Education Leads dataset on Kaggle: https://www.kaggle.com/datasets/lakshmikalyan/lead-scoring-x-online-education. Credit and licence terms are on that page.
-Use Control + Shift + m to toggle the tab key moving focus. Alternatively, use esc then tab to move to the next interactive element on the page.
-No file chosen
-Attach files by dragging & dropping, selecting or pasting them.
