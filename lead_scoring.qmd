@@ -1,0 +1,131 @@
+---
+title: "Which leads should sales prioritise? An exploratory lead scoring analysis in R"
+format: html
+---
+
+```{r}
+#| echo: false
+source("leads_analysis.R")
+test_size <- format(nrow(test_leads), big.mark = ",")
+practice_size <- format(nrow(learn_leads), big.mark = ",")
+all_size <- format(nrow(leads), big.mark = ",")
+test_share_per_100 <- round(100 * nrow(test_leads) / nrow(leads))
+overall_per_100 <- round(100 * mean(leads$Converted), 1)
+base_rate_per_100 <- round(100 * mean(test_leads$Converted), 1)
+test_buyers <- format(sum(test_leads$Converted), big.mark = ",")
+blank_occupation <- format(sum(leads$What.is.your.current.occupation == ""), big.mark = ",")
+blank_occupation_per_100 <- round(100 * mean(leads$What.is.your.current.occupation == ""))
+top_leads <- test_leads[test_leads$score >= 2, ]
+share_of_leads_selected <- round(100 * nrow(top_leads) / nrow(test_leads))
+share_of_buyers_contained <- round(100 * sum(top_leads$Converted) / sum(test_leads$Converted))
+times_better_than_random <- round((sum(top_leads$Converted) / nrow(top_leads)) / mean(test_leads$Converted), 1)
+score_3_leads <- test_leads[test_leads$score == 3, ]
+score_3_range <- binom.test(sum(score_3_leads$Converted), nrow(score_3_leads))$conf.int
+score_3_low <- round(100 * score_3_range[1])
+early_and_rows <- test_leads$time_point == 1 & test_leads$professional_point == 1
+early_and_range <- binom.test(sum(test_leads$Converted[early_and_rows]), sum(early_and_rows))$conf.int
+early_and_low <- round(100 * early_and_range[1])
+early_and_high <- round(100 * early_and_range[2])
+```
+
+**Answer in short:** In an exploratory test, a simple score built from three recorded facts separated leads into groups with different buying rates. If a team had prioritised the `r share_of_leads_selected` in 100 leads with a score of 2 or 3, that group would have contained about `r share_of_buyers_contained` in 100 of all the leads that bought. A random group of the same size would contain about `r share_of_leads_selected` in 100, so the score did about `r times_better_than_random` times better than random. This is not a validated model: the three facts were chosen using all the data, and the data does not say when each fact was recorded.
+
+## Why it matters
+
+A sales team has limited time, so it needs a way to decide which leads to prioritise. This page tests whether a simple score can help with that decision. It looks at past leads, so it shows which leads bought, not proof that contacting them causes a sale.
+
+## The question
+
+Can three simple facts about a lead help rank who is more likely to buy?
+
+## How the score works
+
+Each lead gets 1 point for each of three recorded facts:
+
+1. It spent more time on the website than the median practice lead (the cutoff is `r cutoff_time`).
+2. Its last recorded activity was an SMS.
+3. Its recorded occupation is Working Professional.
+
+The score is the total, from 0 to 3.
+
+## How it was tested
+
+The leads were split once, at random, into `r practice_size` practice leads and `r test_size` test leads. The time cutoff was set using the practice leads only, and the score was then checked on the test leads. The three facts, however, had already been chosen by looking at all leads, so the test leads were not fully separate. Read the results as exploratory.
+
+## Results on the test leads
+
+Overall, `r base_rate_per_100` in 100 of the test leads bought (`r test_buyers` of `r test_size`). Across all `r all_size` leads it was `r overall_per_100` in 100.
+
+```{r}
+#| echo: false
+score_groups <- factor(test_leads$score, levels = 0:3)
+result_table <- data.frame(
+  score = 0:3,
+  leads = as.vector(table(score_groups)),
+  bought = as.vector(tapply(test_leads$Converted, score_groups, sum))
+)
+result_table$bought_per_100 <- round(100 * result_table$bought / result_table$leads, 1)
+knitr::kable(result_table, col.names = c("Score", "Leads", "Bought", "Bought per 100"))
+```
+
+## Which group to prioritise
+
+Each row is one possible rule for selecting leads to prioritise.
+
+```{r}
+#| echo: false
+selections <- list(
+  "Score 3 only" = test_leads$score >= 3,
+  "Score 2 or 3" = test_leads$score >= 2,
+  "Score 1, 2 or 3" = test_leads$score >= 1,
+  "Time point alone" = test_leads$time_point == 1,
+  "SMS point alone" = test_leads$sms_point == 1,
+  "Occupation point alone" = test_leads$professional_point == 1,
+  "Early info: time and occupation" = test_leads$time_point == 1 & test_leads$professional_point == 1,
+  "Early info: time or occupation" = test_leads$time_point == 1 | test_leads$professional_point == 1
+)
+leads_selected <- unname(sapply(selections, sum))
+buyers_inside <- unname(sapply(selections, function(rows) sum(test_leads$Converted[rows])))
+rules_table <- data.frame(
+  rule = names(selections),
+  leads_selected = leads_selected,
+  selected_per_100_leads = round(100 * leads_selected / nrow(test_leads)),
+  bought_per_100_selected = round(100 * buyers_inside / leads_selected),
+  buyers_contained_per_100 = round(100 * buyers_inside / sum(test_leads$Converted)),
+  times_better_than_random = round((buyers_inside / leads_selected) / mean(test_leads$Converted), 1)
+)
+knitr::kable(rules_table, col.names = c("Rule", "Leads selected", "Selected per 100 leads", "Bought per 100 selected", "Buyers contained per 100", "Times better than random"))
+```
+
+Selecting fewer leads gives a higher share who bought, but the group contains fewer of all buyers. Selecting more leads contains more buyers, but a lower share of them bought. Rows 4 to 6 test each fact alone, to show whether combining them adds anything.
+
+The last two rows are rules that use only time on website and occupation, the two facts that seem most likely to be known when a lead first arrives. This is an assumption: the dataset has no timestamps, so it cannot confirm which facts were available at the moment of scoring. In this exploratory test, the useful middle group size (score 2 or 3) depends on including the SMS fact. Because its timing is unknown, checking when SMS activity happens is the most important next step.
+
+In data analysis these columns are called precision (bought per 100 selected), recall (buyers contained per 100) and lift (times better than random).
+
+## Limits
+
+1. **The facts were chosen using all leads.** This may make the results optimistic, so they should be read as exploratory rather than as an unbiased estimate of future performance.
+2. **The timing of the facts is unknown.** The dataset does not say when each fact was recorded. For example, an SMS may have been sent after a salesperson had already contacted the lead, so it may partly reflect sales effort. Before real use, each fact must be known at the moment a lead is scored.
+3. **This shows a pattern, not a cause.** The data shows which leads bought, not that contacting them causes a sale.
+4. **Small groups are uncertain.** All `r nrow(score_3_leads)` test leads with a score of 3 bought, and the exact 95% interval (Clopper-Pearson) is about `r score_3_low` to 100 in 100. The "time and occupation" rule selected only `r sum(early_and_rows)` test leads, with an interval of about `r early_and_low` to `r early_and_high` in 100. These intervals describe uncertainty in the buying rate within this test sample only. They do not correct for limits 1 and 2, so neither rate should be treated as a reliable future number.
+5. **Blank occupation counts as no point.** `r blank_occupation` of the `r all_size` leads (`r blank_occupation_per_100` in 100) left occupation blank, and they got no point for it. The data dictionary also does not give a unit for the time column.
+6. **The rules were chosen for this page.** The table shows all of them, so the choice can be checked.
+
+## How to reproduce
+
+1. Software: `r R.version.string`, with knitr version `r packageVersion("knitr")`.
+2. Split: random seed 42. `r test_size` of `r all_size` leads (`r test_share_per_100` in 100) became test leads, and the other `r practice_size` became practice leads.
+3. Cutoff: the median time on the website among the practice leads.
+4. Missing values: no rows were removed. A blank occupation or blank last activity simply gives no point.
+5. Code: all steps are in an R script and a Quarto file. They are not published with this page yet. Putting them in a public code repository is a next step.
+
+## Next steps
+
+1. Check when each fact is recorded, starting with the SMS activity.
+2. Choose the facts using only practice leads, then test on the test leads.
+3. Test the score on brand new leads as they arrive.
+
+**Learning context:** This is a self-directed learning project, made while studying introductory R, with Claude used for explanations, coding help and feedback.
+
+Data: X Education Leads dataset from Kaggle (lakshmikalyan/lead-scoring-x-online-education). A lead counts as "bought" when the data column Converted is 1. The data file is not shared here. The licence terms are on the Kaggle dataset page.
