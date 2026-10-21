@@ -1,6 +1,6 @@
 # Lead scoring in R: an exploratory analysis
 
-Can three simple facts about a sales lead help decide which leads to prioritise? This project builds a transparent 0 to 3 score in R on a public dataset and tests it on a random hold-out sample of leads.
+Can three recorded facts about a sales lead help prioritise leads? This self-directed learning project uses R to construct a transparent 0–3 score and compare simple selection rules on a random test split. Because predictor selection used the full dataset, the evaluation is exploratory rather than independent.
 
 **Read the report:** https://01a15b35-f593-c789-5b56-30df00a7d75d.share.connect.posit.cloud/
 
