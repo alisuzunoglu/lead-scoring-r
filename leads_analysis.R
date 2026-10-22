@@ -25,6 +25,7 @@ png("occupation_barplot.png", width = 800, height = 600)
 barplot(rate_by_occupation, cex.names = 0.7)
 dev.off()
 
+# Exploration only: 248 is the median time on website across all leads.
 leads$time_point <- ifelse(leads$Total.Time.Spent.on.Website > 248, 1, 0)
 leads$sms_point <- ifelse(leads$Last.Activity == "SMS Sent", 1, 0)
 leads$professional_point <- ifelse(leads$What.is.your.current.occupation == "Working Professional", 1, 0)
@@ -37,7 +38,8 @@ dev.off()
 
 # 2. Exploratory split: practice leads and hidden leads
 set.seed(42)
-test_rows <- sample(nrow(leads), 2772)
+number_of_test_leads <- round(0.3 * nrow(leads))   # 30 in 100 leads (2,772)
+test_rows <- sample(nrow(leads), number_of_test_leads)
 test_leads <- leads[test_rows, ]
 learn_leads <- leads[-test_rows, ]
 

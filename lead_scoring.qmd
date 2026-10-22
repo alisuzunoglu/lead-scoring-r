@@ -99,7 +99,7 @@ knitr::kable(rules_table, col.names = c("Rule", "Leads selected", "Selected per 
 
 For the score thresholds shown (score 3 only, 2 or 3, and 1 or more), selecting a smaller group raised the share who bought but contained fewer of all buyers. The other rules give other trade offs. Rows 4 to 6 test each fact alone, to show whether combining them adds anything.
 
-The last two rows are rules that use only time on website and occupation, the two facts that seem most likely to be known when a lead first arrives. This is an assumption: the dataset has no timestamps, so it cannot confirm which facts were available at the moment of scoring. In this exploratory test, the useful middle group size (score 2 or 3) depends on including the SMS fact. Because its timing is unknown, checking when SMS activity happens is the most important next step.
+The last two rows are rules that use only time on website and occupation, the two facts that seem most likely to be known when a lead first arrives. This is an assumption: the dataset has no timestamps, so it cannot confirm which facts were available at the moment of scoring. The three fact score includes SMS activity, so its practical use depends on confirming that this information was available when a lead is scored. Checking when SMS activity happens is the most important next step.
 
 In data analysis these columns are called precision (bought per 100 selected), recall (buyers contained per 100) and lift (times better than random).
 
