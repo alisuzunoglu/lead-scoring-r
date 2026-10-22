@@ -128,4 +128,6 @@ In data analysis these columns are called precision (bought per 100 selected), r
 
 **Learning context:** This is a self-directed learning project, made while studying introductory R, with Claude used for explanations, coding help and feedback.
 
-Data: X Education Leads dataset from Kaggle (lakshmikalyan/lead-scoring-x-online-education). A lead counts as "bought" when the data column Converted is 1. The data file is not shared here. The licence terms are on the Kaggle dataset page.
+## Data
+
+X Education Leads dataset on Kaggle: https://www.kaggle.com/datasets/lakshmikalyan/lead-scoring-x-online-education. The Kaggle page states that the data set was created by UpGrad-IIIT-B as part of an assignment, and it gives no further licence terms. A lead counts as “bought” when the data column Converted is 1. The CSV is not redistributed here.
