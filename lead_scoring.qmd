@@ -97,7 +97,7 @@ rules_table <- data.frame(
 knitr::kable(rules_table, col.names = c("Rule", "Leads selected", "Selected per 100 leads", "Bought per 100 selected", "Buyers contained per 100", "Times better than random"))
 ```
 
-Selecting fewer leads gives a higher share who bought, but the group contains fewer of all buyers. Selecting more leads contains more buyers, but a lower share of them bought. Rows 4 to 6 test each fact alone, to show whether combining them adds anything.
+For the score thresholds shown (score 3 only, 2 or 3, and 1 or more), selecting a smaller group raised the share who bought but contained fewer of all buyers. The other rules give other trade offs. Rows 4 to 6 test each fact alone, to show whether combining them adds anything.
 
 The last two rows are rules that use only time on website and occupation, the two facts that seem most likely to be known when a lead first arrives. This is an assumption: the dataset has no timestamps, so it cannot confirm which facts were available at the moment of scoring. In this exploratory test, the useful middle group size (score 2 or 3) depends on including the SMS fact. Because its timing is unknown, checking when SMS activity happens is the most important next step.
 
@@ -106,7 +106,7 @@ In data analysis these columns are called precision (bought per 100 selected), r
 ## Limits
 
 1. **The facts were chosen using all leads.** This may make the results optimistic, so they should be read as exploratory rather than as an unbiased estimate of future performance.
-2. **The timing of the facts is unknown.** The dataset does not say when each fact was recorded. For example, an SMS may have been sent after a salesperson had already contacted the lead, so it may partly reflect sales effort. Before real use, each fact must be known at the moment a lead is scored.
+2. **The timing of the facts is unknown.** The dataset and its data dictionary do not say when each fact was recorded, or who performed the last activity. For example, an SMS may have been sent after a salesperson had already contacted the lead, so it may partly reflect sales effort. Before real use, each fact must be known at the moment a lead is scored.
 3. **This shows a pattern, not a cause.** The data shows which leads bought, not that contacting them causes a sale.
 4. **Small groups are uncertain.** All `r nrow(score_3_leads)` test leads with a score of 3 bought, and the exact 95% interval (Clopper-Pearson) is about `r score_3_low` to 100 in 100. The "time and occupation" rule selected only `r sum(early_and_rows)` test leads, with an interval of about `r early_and_low` to `r early_and_high` in 100. These intervals describe uncertainty in the buying rate within this test sample only. They do not correct for limits 1 and 2, so neither rate should be treated as a reliable future number.
 5. **Blank occupation counts as no point.** `r blank_occupation` of the `r all_size` leads (`r blank_occupation_per_100` in 100) left occupation blank, and they got no point for it. The data dictionary also does not give a unit for the time column.
@@ -118,12 +118,12 @@ In data analysis these columns are called precision (bought per 100 selected), r
 2. Split: random seed 42. `r test_size` of `r all_size` leads (`r test_share_per_100` in 100) became test leads, and the other `r practice_size` became practice leads.
 3. Cutoff: the median time on the website among the practice leads.
 4. Missing values: no rows were removed. A blank occupation or blank last activity simply gives no point.
-5. Code: all steps are in an R script and a Quarto file. They are not published with this page yet. Putting them in a public code repository is a next step.
+5. Code: all steps are in an R script and a Quarto file, available at https://github.com/alisuzunoglu/lead-scoring-r.
 
 ## Next steps
 
 1. Check when each fact is recorded, starting with the SMS activity.
-2. Choose the facts using only practice leads, then test on the test leads.
+2. In a future analysis, choose the facts and cutoffs using development data only, then evaluate on data not used for those decisions.
 3. Test the score on brand new leads as they arrive.
 
 **Learning context:** This is a self-directed learning project, made while studying introductory R, with Claude used for explanations, coding help and feedback.
