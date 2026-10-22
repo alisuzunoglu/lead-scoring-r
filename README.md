@@ -30,4 +30,4 @@ Self-directed learning project, made while studying introductory R, with AI assi
 
 ## Data
 
-X Education Leads dataset on Kaggle: https://www.kaggle.com/datasets/lakshmikalyan/lead-scoring-x-online-education. Credit and licence terms are on that page.
+X Education Leads dataset on Kaggle: https://www.kaggle.com/datasets/lakshmikalyan/lead-scoring-x-online-education. The Kaggle page states that the data set was created by UpGrad-IIIT-B as part of an assignment, and it gives no further licence terms. The CSV is not redistributed here.
