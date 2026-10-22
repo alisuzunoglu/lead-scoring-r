@@ -26,7 +26,7 @@ The data file is not included.
 
 ## Learning context
 
-Self-directed learning project, made while studying introductory R.
+Self-directed learning project, made while studying introductory R, with AI assistance for explanations and feedback.
 
 ## Data
 
